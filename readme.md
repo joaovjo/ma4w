@@ -32,7 +32,7 @@ O script é otimizado para sistemas com processadores AMD Ryzen e GPUs AMD, gara
 
 2. Execute o script com privilégios administrativos:  
    ```bash
-   doas sh script.sh
+   doas sh install.sh
    ```
 
 3. Reinicie o sistema para aplicar todas as configurações:  
@@ -42,7 +42,7 @@ O script é otimizado para sistemas com processadores AMD Ryzen e GPUs AMD, gara
 
 ## Estrutura do Repositório
 
-- **`script.sh`**: Script principal para configurar o Alpine Linux.  
+- **`install.sh`**: Script principal para configurar o Alpine Linux.  
 
 ## Observações
 

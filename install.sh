@@ -62,6 +62,7 @@ apk add \
     curl \
     wget \
     gtk+3.0 \
+    gtk4.0 \
     g++ \
     make \
     cmake \

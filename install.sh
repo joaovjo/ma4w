@@ -7,18 +7,36 @@ set -e
 # Variáveis
 LOCALE="pt_BR.UTF-8"
 KEYMAP="br-abnt2"
+USERNAME="joaovjo"
 
+# Instalando e configurando doas e sudo
+echo "Instalando e configurando doas e sudo..."
+apk add doas sudo
+
+# Configurando doas
+echo "permit :wheel" > /etc/doas.d/doas.conf
+addgroup $USERNAME wheel
+
+# Configurando sudo
+echo "%wheel ALL=(ALL) ALL" >> /etc/sudoers
+
+# Garantindo que o usuário esteja no grupo correto
+addgroup $USERNAME wheel
+
+# Atualizando repositórios e sistema
 echo "Atualizando repositórios e sistema..."
-doas apk update
-doas apk upgrade
+apk update
+apk upgrade
 
+# Habilitando repositórios necessários
 echo "Habilitando repositórios necessários..."
-doas sed -i '/^#http/s/^#//' /etc/apk/repositories
-doas sed -i '/^#http.*community/s/^#//' /etc/apk/repositories
-doas apk update
+sed -i '/^#http/s/^#//' /etc/apk/repositories
+sed -i '/^#http.*community/s/^#//' /etc/apk/repositories
+apk update
 
+# Instalando pacotes essenciais
 echo "Instalando pacotes essenciais..."
-doas apk add \
+apk add \
     sddm \
     hyprland \
     wayland \
@@ -44,7 +62,6 @@ doas apk add \
     curl \
     wget \
     gtk+3.0 \
-    gtk4.0 \
     g++ \
     make \
     cmake \
@@ -62,28 +79,32 @@ doas apk add \
     pcmanfm \
     docker
 
+# Habilitando serviços
 echo "Habilitando serviços..."
-doas rc-update add dbus
-doas rc-update add elogind
-doas rc-update add seatd
-doas rc-update add sddm
-doas rc-update add docker
-doas rc-service dbus start
-doas rc-service elogind start
-doas rc-service seatd start
-doas rc-service sddm start
-doas rc-service docker start
+rc-update add dbus
+rc-update add elogind
+rc-update add seatd
+rc-update add sddm
+rc-update add docker
+rc-service dbus start
+rc-service elogind start
+rc-service seatd start
+rc-service sddm start
+rc-service docker start
 
+# Configurando idioma e teclado
 echo "Configurando idioma e teclado..."
-doas setup-keymap $KEYMAP
-echo "export LANG=$LOCALE" | doas tee -a /etc/profile.d/locale.sh
-echo "$LOCALE UTF-8" | doas tee -a /etc/locale.gen
-doas locale-gen
+setup-keymap $KEYMAP
+echo "export LANG=$LOCALE" > /etc/profile.d/locale.sh
+echo "$LOCALE UTF-8" >> /etc/locale.gen
+locale-gen
 
+# Configurando driver de vídeo
 echo "Configurando driver de vídeo..."
-doas modprobe amdgpu
-echo "amdgpu" | doas tee -a /etc/modules
+modprobe amdgpu
+echo "amdgpu" >> /etc/modules
 
+# Baixando e compilando nwg-shell e ferramentas relacionadas
 echo "Baixando e compilando nwg-shell e ferramentas relacionadas..."
 mkdir -p ~/build
 cd ~/build
@@ -98,53 +119,55 @@ cd ..
 git clone https://github.com/nwg-piotr/nwg-look.git
 cd nwg-look
 make
-doas make install
+make install
 cd ..
 
 # Clonando e instalando nwg-drawer
 git clone https://github.com/nwg-piotr/nwg-drawer.git
 cd nwg-drawer
 make
-doas make install
+make install
 cd ..
 
 # Clonando e instalando nwg-bar
 git clone https://github.com/nwg-piotr/nwg-bar.git
 cd nwg-bar
 make
-doas make install
+make install
 cd ..
 
 # Clonando e instalando nwg-menu
 git clone https://github.com/nwg-piotr/nwg-menu.git
 cd nwg-menu
 make
-doas make install
+make install
 cd ..
 
 # Clonando e instalando nwg-panel
 git clone https://github.com/nwg-piotr/nwg-panel.git
 cd nwg-panel
 make
-doas make install
+make install
 cd ..
 
+# Configurando Hyprland como padrão para todos os usuários
 echo "Configurando Hyprland como padrão para todos os usuários..."
 
 # Define Hyprland como o ambiente padrão para o SDDM
-echo "[Desktop]" | doas tee /etc/sddm.conf.d/default.conf
-echo "Session=hyprland" | doas tee -a /etc/sddm.conf.d/default.conf
+echo "[Desktop]" > /etc/sddm.conf.d/default.conf
+echo "Session=hyprland" >> /etc/sddm.conf.d/default.conf
 
 # Define o Hyprland para o usuário atual
 echo "exec Hyprland" > ~/.xinitrc
 
 # Cria configuração global para novos usuários
-echo "exec Hyprland" | doas tee /etc/skel/.xinitrc
+echo "exec Hyprland" > /etc/skel/.xinitrc
 
+# Instalando Portainer
 echo "Instalando Portainer..."
-doas docker pull portainer/portainer-ce
-doas docker volume create portainer_data
-doas docker run -d \
+docker pull portainer/portainer-ce
+docker volume create portainer_data
+docker run -d \
     --name=portainer \
     --restart=always \
     -p 8000:8000 \

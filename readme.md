@@ -26,7 +26,7 @@ O script é otimizado para sistemas com processadores AMD Ryzen e GPUs AMD, gara
 
 1. Clone este repositório no seu sistema:  
    ```bash
-   git clone https://github.com/joaovjo/ma4w
+   git clone https://github.com/joaovjo/ma4w.git
    cd ma4w
    ```
 
